@@ -1,0 +1,271 @@
+        -:    0:Source:huff.c
+        -:    0:Graph:huff.gcno
+        -:    0:Data:huff.gcda
+        -:    0:Runs:1
+        -:    1:#include <stdlib.h>
+        -:    2:#include <stdio.h>
+        -:    3:#include <math.h>
+        -:    4:#include<string.h>
+        -:    5:#include "huffman.h"
+        -:    6:
+        -:    7:
+        1:    8:int main(int argc, char** argv){
+        -:    9:  int *warray=0,*wArr=0;
+        -:   10:  char*carray=0,*cArr=0;
+        -:   11:  char temp;
+        1:   12:  int size=0,i=0,j=0,f=0;
+        -:   13:  minheap* mhp;
+        -:   14:  tnode* huff_tree;
+        -:   15:
+        1:   16:  FILE *fptr =fopen(argv[1],"r");
+        -:   17:  
+        -:   18:  
+        1:   19:  if (fptr == NULL){
+    #####:   20:    fprintf
+        -:   21:      (stderr,"Cannot load file %s\n", argv[1]);
+    #####:   22:    return EXIT_FAILURE;
+        -:   23:  }
+        -:   24:  
+        1:   25:  int length=strlen(argv[1]);
+        1:   26:  char *outfile_name=(char*)malloc((length+5)*sizeof(char));
+        -:   27:  sprintf(outfile_name,"%s.huff",argv[1]);
+        1:   28:  FILE *outfptr=fopen(outfile_name,"wb");
+        -:   29:    
+        1:   30:  warray = (int*)malloc(256*sizeof(int));
+        1:   31:  carray = (char*)malloc(256*sizeof(char));
+        1:   32:  wArr = (int*)malloc(256*sizeof(int));
+        1:   33:  cArr = (char*)malloc(256*sizeof(int));
+   628143:   34:  while((temp = fgetc(fptr)) != EOF){ 
+   628141:   35:    wArr[(int)temp]+=1;
+   628141:   36:    if(wArr[(int)temp]==1){
+       75:   37:      cArr[(int)temp]=temp;
+       75:   38:      size+=1;
+        -:   39:      }
+        -:   40:  }
+      257:   41:  for(i=0;i<256;i++){
+        -:   42:   
+      256:   43:      if(wArr[i]){
+       75:   44:	warray[j]=wArr[i];
+       75:   45:	carray[j]=cArr[i];
+       75:   46:	j++;
+        -:   47:      }
+        -:   48:
+        -:   49:    }
+        -:   50:
+        1:   51:  mhp = construct_minheap(carray,warray,size);
+        1:   52:  mhp->array=(tnode**)realloc(mhp->array,(mhp->size+1)*sizeof(tnode*));
+        1:   53:  insert_tnode(mhp,construct_tnode(EOF,1));
+        1:   54:  size++;
+        1:   55:  huff_tree = huffman_tree(mhp);
+        -:   56:
+        1:   57:  int cnt=0;
+        -:   58:  char input;
+        1:   59:  unsigned char bit_fld=0;
+        1:   60:  int *sequence =(int*)malloc(30*sizeof(int));
+        -:   61:  i=0;
+        1:   62:  *sequence=0;
+        1:   63:  rewind(fptr);
+        1:   64:  fwrite(&size,4,1,outfptr);
+        1:   65:  print_tree(huff_tree,outfptr,&cnt,&bit_fld);
+   628142:   66:  while((input=fgetc(fptr))!=EOF){
+        -:   67:    i=0;
+   628141:   68:    f=0;
+   628141:   69:    find_sequence(huff_tree,i,input,sequence,&bit_fld,&cnt,outfptr,&f);
+        -:   70:    
+        -:   71:  }  
+        -:   72:  i=0;
+        1:   73:  f=0;
+        1:   74:  find_sequence(huff_tree,i,EOF,sequence,&bit_fld,&cnt,outfptr,&f);
+        1:   75:  fwrite(&bit_fld,1,1,outfptr);
+        1:   76:  free(warray);
+        1:   77:  free(carray);
+        1:   78:  free(wArr);
+        1:   79:  free(cArr);
+        1:   80:  free(sequence);
+        1:   81:  free(mhp);
+        1:   82:  free(huff_tree);
+        1:   83:  fclose(fptr);
+        1:   84:  fclose(outfptr);
+        -:   85: 
+        1:   86:  return 0;
+        -:   87:
+        -:   88:  
+        -:   89:
+        -:   90:}
+        -:   91:
+    #####:   92:tnode *construct_tnode(char Data,int Weight){
+     151*:   93:  tnode* new = (tnode *)malloc(sizeof(tnode));
+     151*:   94:  new -> data = Data;
+     151*:   95:  new -> weight = Weight;
+      76*:   96:  new -> left = NULL;
+       1*:   97:  new -> right = NULL;
+    #####:   98:  return new;
+        -:   99:}
+        -:  100:
+        1:  101:minheap *init_minheap(int Size){
+        1:  102:  minheap* mhp=(minheap*)malloc(sizeof(minheap));
+        1:  103:  mhp->size =Size;
+        1:  104:  mhp->array=(tnode**)malloc(Size*sizeof(tnode*));
+        1:  105:  return mhp;
+        -:  106:}
+        -:  107:
+        -:  108:
+       76:  109:void insert_tnode(minheap* mhp,tnode* new){
+       76:  110:  mhp->size+=1;
+        -:  111:  int index=mhp->size-1;
+      171:  112:  while (index && new->weight < mhp->array[(index-1)/2]->weight){
+       95:  113:    mhp->array[index] = mhp->array[(index-1)/2];
+        -:  114:    index =(index-1)/2;
+        -:  115:  }
+       76:  116:  mhp->array[index]=new;
+       76:  117:}
+        -:  118:
+    #####:  119:void swap_tnode(tnode** a,tnode** b){
+     552*:  120:  tnode* temp = *a;
+     552*:  121:  *a = *b;
+     552*:  122:  *b = temp;
+    #####:  123:}
+        -:  124:  
+        -:  125:
+      188:  126:void heapify(minheap* mhp,int parent){
+        -:  127:  int min = parent;
+      740:  128:  int left =2*parent+1;
+      740:  129:  int right = 2*parent+2;
+      740:  130:  if(left<mhp->size && (mhp->array[left]->weight) < (mhp->array[min]->weight)){
+        -:  131:    min = left;
+        -:  132:  }
+      740:  133:  if(right<mhp->size && (mhp->array[right]->weight) < (mhp->array[min]->weight)){
+        -:  134:    min = right;
+        -:  135:  }
+      740:  136:  if(parent != min){
+      552:  137:    swap_tnode(&mhp->array[min],&mhp->array[parent]);
+        -:  138:    heapify(mhp,min);
+        -:  139:  }
+        -:  140:  
+      188:  141:}
+        -:  142:
+      151:  143:tnode* delete_tnode(minheap*mhp){
+      151:  144:  tnode* temp = mhp->array[0];
+      151:  145:  mhp->array[0]=mhp->array[(mhp->size)-1];
+      151:  146:  --mhp->size;
+      151:  147:  heapify(mhp,0);
+      151:  148:  return temp;
+        -:  149:}
+        -:  150:
+        1:  151:minheap* construct_minheap(char *carray,int *warray,int Size){
+        1:  152:  minheap* mhp = init_minheap(Size);
+        -:  153:  int i;
+       76:  154:  for(i=0;i<Size;i++){
+       75:  155:    mhp->array[i]=construct_tnode(carray[i],warray[i]);
+        -:  156:  }
+        1:  157:  mhp->size=Size;
+       38:  158:   for(i=(mhp->size-2)/2;i>=0;--i){
+       37:  159:    heapify(mhp,i);
+        -:  160:    }
+        1:  161:  return mhp;
+        -:  162:}
+        -:  163:
+        1:  164:tnode* huffman_tree(minheap*mhp){
+        -:  165:  tnode* left;
+        -:  166:  tnode* right;
+        -:  167:  tnode* root;
+        -:  168:  
+       76:  169:  while(mhp->size>1){
+       75:  170:    left = delete_tnode(mhp);
+       75:  171:    right = delete_tnode(mhp);
+       75:  172:    root = construct_tnode('@',left->weight+right->weight);
+       75:  173:    root->left=left;
+       75:  174:    root->right=right;
+       75:  175:    insert_tnode(mhp,root);
+        -:  176:  }
+        1:  177:  return delete_tnode(mhp);
+        -:  178:}
+        -:  179:
+    #####:  180:void InorderPrint(tnode*node){
+    #####:  181:  if(node == NULL){
+        -:  182:    return;
+        -:  183:  }
+    #####:  184:  InorderPrint(node->left);
+    #####:  185:  printf("%d\n",node->weight);
+    #####:  186:  InorderPrint(node->right);
+        -:  187:}
+        -:  188:
+ 49095830:  189:void find_sequence(tnode*root,int i,char key,int*sequence,unsigned char *bit_fld,int*cnt,FILE*fptr,int*f){
+ 49095830:  190:  if(*f==1){return;}
+ 46626226:  191:  if(root->left){
+ 24233844:  192:    sequence[i]=0;
+ 24233844:  193:    find_sequence(root->left,i+1,key,sequence,bit_fld,cnt,fptr,f);
+        -:  194:  }
+ 46626226:  195:  if(root->right){
+ 24233844:  196:    sequence[i]=1;
+ 24233844:  197:    find_sequence(root->right,i+1,key,sequence,bit_fld,cnt,fptr,f);
+        -:  198:  }
+        -:  199:      
+ 46626226:  200:  if((root->left==NULL)&&(root->right==NULL)){
+ 22392382:  201:    if(root->data == key){
+        -:  202:      int j;
+   620807:  203:      *f=1;
+  4595290:  204:      for(j=0;j<i;j++){
+  3974483:  205:	if(sequence[j]==1){
+  1504879:  206:	  write_bits(bit_fld,1,cnt,fptr);
+        -:  207:	}
+  3974483:  208:	if(sequence[j]==0){
+  2469604:  209:	  write_bits(bit_fld,0,cnt,fptr);
+        -:  210:	}
+        -:  211:      }
+        -:  212:    }     
+        -:  213:      
+        -:  214:  }
+        -:  215:}
+        -:  216:
+        -:  217:
+       76:  218:void print_tree(tnode*root,FILE*fptr,int*cnt,unsigned char* bit_fld){
+      151:  219:  if((root->left==NULL) && (root->right==NULL)){
+       76:  220:    write_bits(bit_fld,1,cnt,fptr);
+        -:  221:    //printf("%d",1);
+       76:  222:    write_bits(bit_fld,(unsigned char)(root->data),cnt,fptr);
+        -:  223:    //printf("%c",root->data); 
+        -:  224:    return;
+        -:  225:  }
+       75:  226:  write_bits(bit_fld,0,cnt,fptr);
+        -:  227:  //printf("%d",0);
+       75:  228:  print_tree(root->left,fptr,cnt,bit_fld);
+       75:  229:  print_tree(root->right,fptr,cnt,bit_fld);
+       75:  230:  return;
+        -:  231:}
+        -:  232:  
+        -:  233:
+  3974710:  234: void write_bits(unsigned char *bit_fld,unsigned char num,int*cnt,FILE*fptr){
+        -:  235:   unsigned char buff=0; 
+        -:  236:
+  3974710:  237:   if(*cnt == 8){
+        -:  238:     
+   496829:  239:       fwrite(bit_fld,1,1,fptr);
+   496829:  240:       *bit_fld=0;
+   496829:  241:       *cnt=0;
+        -:  242:     }
+  3974710:  243:     if(num == 0){
+  2469683:  244:       *cnt+=1;
+        -:  245:     }
+  1505027:  246:     else if(num == 1){
+  1504955:  247:       *bit_fld |= (1<<(7-*cnt));
+  1504955:  248:       *cnt+=1;
+        -:  249:     }
+        -:  250:     else{
+        -:  251:       buff = num;
+       72:  252:       buff>>=*cnt;
+       72:  253:       *bit_fld+=buff;
+       72:  254:       fwrite(bit_fld,1,1,fptr);
+       72:  255:       *bit_fld=0;
+        -:  256:       buff = num;
+       72:  257:       buff<<=(8-*cnt);
+       72:  258:       *bit_fld+=buff;
+        -:  259:     }
+        -:  260:       
+        -:  261:       
+        -:  262:     
+        -:  263:	
+        -:  264:   
+  3974710:  265:}
+        -:  266:
+        -:  267:
