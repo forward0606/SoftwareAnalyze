@@ -37,7 +37,7 @@
         -:   33:
         -:   34:#ifdef __va_arg_pack
         -:   35:__fortify_function int
-        -:   36:__NTH (sprintf (char *__restrict __s, const char *__restrict __fmt, ...))
+        1:   36:__NTH (sprintf (char *__restrict __s, const char *__restrict __fmt, ...))
         -:   37:{
         1:   38:  return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
         -:   39:				  __glibc_objsize (__s), __fmt,
@@ -104,14 +104,14 @@
         -:  100:
         -:  101:# ifdef __va_arg_pack
         -:  102:__fortify_function int
-        -:  103:fprintf (FILE *__restrict __stream, const char *__restrict __fmt, ...)
+    #####:  103:fprintf (FILE *__restrict __stream, const char *__restrict __fmt, ...)
         -:  104:{
     #####:  105:  return __fprintf_chk (__stream, __USE_FORTIFY_LEVEL - 1, __fmt,
         -:  106:			__va_arg_pack ());
         -:  107:}
         -:  108:
         -:  109:__fortify_function int
-        -:  110:printf (const char *__restrict __fmt, ...)
+    #####:  110:printf (const char *__restrict __fmt, ...)
         -:  111:{
     #####:  112:  return __printf_chk (__USE_FORTIFY_LEVEL - 1, __fmt, __va_arg_pack ());
         -:  113:}

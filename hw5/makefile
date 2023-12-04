@@ -1,5 +1,5 @@
 a.out:
-	gcc --coverage -O2 huff.c huffman.h
+	gcc --coverage -g -O2 huff.c huffman.h
 	mv a-huff.gcno huff.gcno
 	mv a-huffman.gcno huffman.gcno
 	

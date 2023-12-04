@@ -31,13 +31,13 @@
             <td class="headerValue">app.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">1</td>
-            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">6</td>
             <td class="headerCovTableEntryLo">33.3 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-04 18:24:10</td>
+            <td class="headerValue">2023-12-04 22:51:27</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -95,7 +95,7 @@
 <a name="33"><span class="lineNum">      33 </span>            : </a>
 <a name="34"><span class="lineNum">      34 </span>            : #ifdef __va_arg_pack</a>
 <a name="35"><span class="lineNum">      35 </span>            : __fortify_function int</a>
-<a name="36"><span class="lineNum">      36 </span>            : __NTH (sprintf (char *__restrict __s, const char *__restrict __fmt, ...))</a>
+<a name="36"><span class="lineNum">      36 </span><span class="lineCov">          1 : __NTH (sprintf (char *__restrict __s, const char *__restrict __fmt, ...))</span></a>
 <a name="37"><span class="lineNum">      37 </span>            : {</a>
 <a name="38"><span class="lineNum">      38 </span><span class="lineCov">          1 :   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,</span></a>
 <a name="39"><span class="lineNum">      39 </span>            :                                   __glibc_objsize (__s), __fmt,</a>
@@ -162,14 +162,14 @@
 <a name="100"><span class="lineNum">     100 </span>            : </a>
 <a name="101"><span class="lineNum">     101 </span>            : # ifdef __va_arg_pack</a>
 <a name="102"><span class="lineNum">     102 </span>            : __fortify_function int</a>
-<a name="103"><span class="lineNum">     103 </span>            : fprintf (FILE *__restrict __stream, const char *__restrict __fmt, ...)</a>
+<a name="103"><span class="lineNum">     103 </span><span class="lineNoCov">          0 : fprintf (FILE *__restrict __stream, const char *__restrict __fmt, ...)</span></a>
 <a name="104"><span class="lineNum">     104 </span>            : {</a>
 <a name="105"><span class="lineNum">     105 </span><span class="lineNoCov">          0 :   return __fprintf_chk (__stream, __USE_FORTIFY_LEVEL - 1, __fmt,</span></a>
 <a name="106"><span class="lineNum">     106 </span>            :                         __va_arg_pack ());</a>
 <a name="107"><span class="lineNum">     107 </span>            : }</a>
 <a name="108"><span class="lineNum">     108 </span>            : </a>
 <a name="109"><span class="lineNum">     109 </span>            : __fortify_function int</a>
-<a name="110"><span class="lineNum">     110 </span>            : printf (const char *__restrict __fmt, ...)</a>
+<a name="110"><span class="lineNum">     110 </span><span class="lineNoCov">          0 : printf (const char *__restrict __fmt, ...)</span></a>
 <a name="111"><span class="lineNum">     111 </span>            : {</a>
 <a name="112"><span class="lineNum">     112 </span><span class="lineNoCov">          0 :   return __printf_chk (__USE_FORTIFY_LEVEL - 1, __fmt, __va_arg_pack ());</span></a>
 <a name="113"><span class="lineNum">     113 </span>            : }</a>
